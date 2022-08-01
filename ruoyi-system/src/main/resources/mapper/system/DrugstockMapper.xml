@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DrugstockMapper">
+    
+    <resultMap type="Drugstock" id="DrugstockResult">
+        <result property="id"    column="id"    />
+        <result property="drugId"    column="drug_id"    />
+        <result property="drugName"    column="drug_name"    />
+        <result property="drugEngname"    column="drug_engname"    />
+        <result property="drugType"    column="drug_type"    />
+        <result property="drugPackage"    column="drug_package"    />
+        <result property="drugCount"    column="drug_count"    />
+        <result property="drugPrice"    column="drug_price"    />
+        <result property="drugPackingunit"    column="drug_packingunit"    />
+        <result property="drugOrder"    column="drug_order"    />
+        <result property="drugValiddate"    column="drug_validdate"    />
+        <result property="drugFactory"    column="drug_factory"    />
+    </resultMap>
+
+    <sql id="selectDrugstockVo">
+            select id, drug_id, drug_name, drug_engname, drug_type, drug_package, drug_count, drug_price, drug_packingunit, drug_order, drug_validdate, drug_factory from drugstock
+    </sql>
+
+    <select id="selectDrugstockList" parameterType="Drugstock" resultMap="DrugstockResult">
+        <include refid="selectDrugstockVo"/>
+        <where>  
+            <if test="drugId != null "> and drug_id = #{drugId}</if>
+            <if test="drugName != null  and drugName != ''"> and drug_name like concat('%', #{drugName}, '%')</if>
+            <if test="drugEngname != null  and drugEngname != ''"> and drug_engname like concat('%', #{drugEngname}, '%')</if>
+            <if test="drugType != null  and drugType != ''"> and drug_type = #{drugType}</if>
+            <if test="drugPackage != null  and drugPackage != ''"> and drug_package = #{drugPackage}</if>
+            <if test="drugCount != null  and drugCount != ''"> and drug_count = #{drugCount}</if>
+            <if test="drugPrice != null "> and drug_price = #{drugPrice}</if>
+            <if test="drugPackingunit != null  and drugPackingunit != ''"> and drug_packingunit = #{drugPackingunit}</if>
+            <if test="drugOrder != null "> and drug_order = #{drugOrder}</if>
+            <if test="drugValiddate != null "> and drug_validdate = #{drugValiddate}</if>
+            <if test="drugFactory != null  and drugFactory != ''"> and drug_factory = #{drugFactory}</if>
+        </where>
+    </select>
+    
+    <select id="selectDrugstockById" parameterType="Long" resultMap="DrugstockResult">
+        <include refid="selectDrugstockVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDrugstock" parameterType="Drugstock" useGeneratedKeys="true" keyProperty="id">
+        insert into drugstock
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="drugId != null">drug_id,</if>
+            <if test="drugName != null">drug_name,</if>
+            <if test="drugEngname != null">drug_engname,</if>
+            <if test="drugType != null">drug_type,</if>
+            <if test="drugPackage != null">drug_package,</if>
+            <if test="drugCount != null">drug_count,</if>
+            <if test="drugPrice != null">drug_price,</if>
+            <if test="drugPackingunit != null">drug_packingunit,</if>
+            <if test="drugOrder != null">drug_order,</if>
+            <if test="drugValiddate != null">drug_validdate,</if>
+            <if test="drugFactory != null">drug_factory,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="drugId != null">#{drugId},</if>
+            <if test="drugName != null">#{drugName},</if>
+            <if test="drugEngname != null">#{drugEngname},</if>
+            <if test="drugType != null">#{drugType},</if>
+            <if test="drugPackage != null">#{drugPackage},</if>
+            <if test="drugCount != null">#{drugCount},</if>
+            <if test="drugPrice != null">#{drugPrice},</if>
+            <if test="drugPackingunit != null">#{drugPackingunit},</if>
+            <if test="drugOrder != null">#{drugOrder},</if>
+            <if test="drugValiddate != null">#{drugValiddate},</if>
+            <if test="drugFactory != null">#{drugFactory},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDrugstock" parameterType="Drugstock">
+        update drugstock
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="drugId != null">drug_id = #{drugId},</if>
+            <if test="drugName != null">drug_name = #{drugName},</if>
+            <if test="drugEngname != null">drug_engname = #{drugEngname},</if>
+            <if test="drugType != null">drug_type = #{drugType},</if>
+            <if test="drugPackage != null">drug_package = #{drugPackage},</if>
+            <if test="drugCount != null">drug_count = #{drugCount},</if>
+            <if test="drugPrice != null">drug_price = #{drugPrice},</if>
+            <if test="drugPackingunit != null">drug_packingunit = #{drugPackingunit},</if>
+            <if test="drugOrder != null">drug_order = #{drugOrder},</if>
+            <if test="drugValiddate != null">drug_validdate = #{drugValiddate},</if>
+            <if test="drugFactory != null">drug_factory = #{drugFactory},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDrugstockById" parameterType="Long">
+        delete from drugstock where id = #{id}
+    </delete>
+
+    <delete id="deleteDrugstockByIds" parameterType="String">
+        delete from drugstock where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectDrugstockListLimit" parameterType="Drugstock" resultMap="DrugstockResult">
+        <include refid="selectDrugstockVo"/>
+        <where>
+            <if test="drugId != null "> and drug_id = #{drugId}</if>
+            <if test="drugName != null  and drugName != ''"> and drug_name like concat('%', #{drugName}, '%')</if>
+            <if test="drugEngname != null  and drugEngname != ''"> and drug_engname like concat('%', #{drugEngname}, '%')</if>
+            <if test="drugType != null  and drugType != ''"> and drug_type = #{drugType}</if>
+            <if test="drugPackage != null  and drugPackage != ''"> and drug_package = #{drugPackage}</if>
+            <if test="drugCount != null  and drugCount != ''"> and drug_count = #{drugCount}</if>
+            <if test="drugPrice != null "> and drug_price = #{drugPrice}</if>
+            <if test="drugPackingunit != null  and drugPackingunit != ''"> and drug_packingunit = #{drugPackingunit}</if>
+            <if test="drugOrder != null "> and drug_order = #{drugOrder}</if>
+            <if test="drugValiddate != null "> and drug_validdate = #{drugValiddate}</if>
+            <if test="drugFactory != null  and drugFactory != ''"> and drug_factory = #{drugFactory}</if>
+             and drug_count > 0
+        </where>
+    </select>
+
+</mapper>

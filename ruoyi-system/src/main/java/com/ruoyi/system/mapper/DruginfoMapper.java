@@ -58,4 +58,6 @@ public interface DruginfoMapper
      * @return 结果
      */
     public int deleteDruginfoByIds(Long[] ids);
+
+    Druginfo selectDruginfoBydrugId(Long drugId);
 }

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DrugoutMapper">
+    
+    <resultMap type="Drugout" id="DrugoutResult">
+        <result property="id"    column="id"    />
+        <result property="outStatus"    column="out_status"    />
+        <result property="outType"    column="out_type"    />
+        <result property="outOrderid"    column="out_orderid"    />
+        <result property="outDate"    column="out_date"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="isvalid"    column="isvalid"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <resultMap id="DrugoutDrugoutdetailResult" type="Drugout" extends="DrugoutResult">
+        <collection property="drugoutdetailList" notNullColumn="sub_id" javaType="java.util.List" resultMap="DrugoutdetailResult" />
+    </resultMap>
+
+    <resultMap type="Drugoutdetail" id="DrugoutdetailResult">
+        <result property="id"    column="sub_id"    />
+        <result property="drugoutId"    column="sub_drugout_id"    />
+        <result property="drugName"    column="sub_drug_name"    />
+        <result property="drugPackage"    column="sub_drug_package"    />
+        <result property="drugCount"    column="sub_drug_count"    />
+        <result property="drugPrice"    column="sub_drug_price"    />
+        <result property="drugOrder"    column="sub_drug_order"    />
+        <result property="drugValiddate"    column="sub_drug_validdate"    />
+        <result property="remark"    column="sub_remark"    />
+        <result property="drugType"    column="sub_drug_type"    />
+        <result property="drugId"    column="sub_drug_id"    />
+        <result property="drugPackingunit"    column="sub_drug_packingunit"    />
+    </resultMap>
+
+    <sql id="selectDrugoutVo">
+        select id, out_status, out_type, out_orderid, out_date, create_by, create_time, update_time, update_by, isvalid, remark from drugout
+    </sql>
+
+    <select id="selectDrugoutList" parameterType="Drugout" resultMap="DrugoutResult">
+        <include refid="selectDrugoutVo"/>
+        <where>  
+            <if test="outStatus != null  and outStatus != ''"> and out_status = #{outStatus}</if>
+            <if test="outType != null  and outType != ''"> and out_type = #{outType}</if>
+            <if test="outOrderid != null "> and out_orderid = #{outOrderid}</if>
+            <if test="params.beginOutDate != null and params.beginOutDate != '' and params.endOutDate != null and params.endOutDate != ''"> and out_date between #{params.beginOutDate} and #{params.endOutDate}</if>
+            <if test="isvalid != null "> and isvalid = #{isvalid}</if>
+        </where>
+    </select>
+    
+    <select id="selectDrugoutById" parameterType="Long" resultMap="DrugoutDrugoutdetailResult">
+        select a.id, a.out_status, a.out_type, a.out_orderid, a.out_date, a.create_by, a.create_time, a.update_time, a.update_by, a.isvalid, a.remark,
+ b.id as sub_id, b.drugout_id as sub_drugout_id, b.drug_name as sub_drug_name, b.drug_package as sub_drug_package, b.drug_count as sub_drug_count, b.drug_price as sub_drug_price, b.drug_order as sub_drug_order, b.drug_validdate as sub_drug_validdate, b.remark as sub_remark, b.drug_type as sub_drug_type, b.drug_id as sub_drug_id, b.drug_packingunit as sub_drug_packingunit
+        from drugout a
+        left join drugoutdetail b on b.drugout_id = a.id
+        where a.id = #{id}
+    </select>
+        
+    <insert id="insertDrugout" parameterType="Drugout" useGeneratedKeys="true" keyProperty="id">
+        insert into drugout
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="outStatus != null">out_status,</if>
+            <if test="outType != null">out_type,</if>
+            <if test="outOrderid != null">out_orderid,</if>
+            <if test="outDate != null">out_date,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="isvalid != null">isvalid,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="outStatus != null">#{outStatus},</if>
+            <if test="outType != null">#{outType},</if>
+            <if test="outOrderid != null">#{outOrderid},</if>
+            <if test="outDate != null">#{outDate},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="isvalid != null">#{isvalid},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDrugout" parameterType="Drugout">
+        update drugout
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="outStatus != null">out_status = #{outStatus},</if>
+            <if test="outType != null">out_type = #{outType},</if>
+            <if test="outOrderid != null">out_orderid = #{outOrderid},</if>
+            <if test="outDate != null">out_date = #{outDate},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="isvalid != null">isvalid = #{isvalid},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDrugoutById" parameterType="Long">
+        delete from drugout where id = #{id}
+    </delete>
+
+    <delete id="deleteDrugoutByIds" parameterType="String">
+        delete from drugout where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <delete id="deleteDrugoutdetailByDrugoutIds" parameterType="String">
+        delete from drugoutdetail where drugout_id in 
+        <foreach item="drugoutId" collection="array" open="(" separator="," close=")">
+            #{drugoutId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteDrugoutdetailByDrugoutId" parameterType="Long">
+        delete from drugoutdetail where drugout_id = #{drugoutId}
+    </delete>
+
+    <insert id="batchDrugoutdetail">
+        insert into drugoutdetail( id, drugout_id, drug_name, drug_package, drug_count, drug_price, drug_order, drug_validdate, remark, drug_type, drug_id, drug_packingunit) values
+		<foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.id}, #{item.drugoutId}, #{item.drugName}, #{item.drugPackage}, #{item.drugCount}, #{item.drugPrice}, #{item.drugOrder}, #{item.drugValiddate}, #{item.remark}, #{item.drugType}, #{item.drugId}, #{item.drugPackingunit})
+        </foreach>
+    </insert>
+</mapper>

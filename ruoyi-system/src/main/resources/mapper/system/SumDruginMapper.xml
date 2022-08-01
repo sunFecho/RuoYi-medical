@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.SumDruginMapper">
+
+    <resultMap type="SumDrugin" id="SumDruginResult">
+        <result property="sumall"    column="sum"    />
+        <result property="sumcount"    column="sumcount"    />
+    </resultMap>
+
+
+    <select id="selectSum" parameterType="SumDrugin" resultMap="SumDruginResult">
+        SELECT
+            sum( c.total ) AS sum,
+	        sum( c.drug_count ) AS sumcount
+        FROM
+            (
+            SELECT
+            b.drug_count * b.drug_price AS total,
+            b.drug_count
+            FROM
+            drugin a
+            INNER JOIN drugindetail b ON b.drugin_id = a.id
+            )c
+    </select>
+    <select id="selectSumout" parameterType="SumDrugin" resultMap="SumDruginResult">
+        SELECT
+            sum( c.total ) AS sum,
+	        sum( c.drug_count ) AS sumcount
+        FROM
+            (
+            SELECT
+            b.drug_count * b.drug_price AS total,
+            b.drug_count
+            FROM
+            drugout a
+            INNER JOIN drugoutdetail b ON b.drugout_id = a.id
+            )c
+    </select>
+    <select id="selectSumsock" parameterType="SumDrugin" resultMap="SumDruginResult">
+        SELECT
+            sum( c.total ) AS sum,
+            sum( c.drug_count ) AS sumcount
+        FROM
+            (
+            SELECT
+            drug_count * drug_price AS total,
+            drug_count
+            FROM
+            drugstock
+            )c
+    </select>
+
+</mapper>

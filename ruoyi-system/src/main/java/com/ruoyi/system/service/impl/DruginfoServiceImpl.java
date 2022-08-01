@@ -90,4 +90,10 @@ public class DruginfoServiceImpl implements IDruginfoService
     {
         return druginfoMapper.deleteDruginfoById(id);
     }
+
+    @Override
+    public Druginfo selectDruginfoBydrugId(Long drugId) {
+        return druginfoMapper.selectDruginfoBydrugId(drugId);
+    }
+
 }

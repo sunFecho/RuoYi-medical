@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DruginMapper">
+
+    <resultMap type="Drugin" id="DruginResult">
+        <result property="id"    column="id"    />
+        <result property="inStatus"    column="in_status"    />
+        <result property="inType"    column="in_type"    />
+        <result property="inOrderid"    column="in_orderid"    />
+        <result property="inDate"    column="in_date"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="isvalid"    column="isvalid"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <resultMap id="DruginDrugindetailResult" type="Drugin" extends="DruginResult">
+        <collection property="drugindetailList" notNullColumn="sub_id" javaType="java.util.List" resultMap="DrugindetailResult" />
+    </resultMap>
+
+    <resultMap type="Drugindetail" id="DrugindetailResult">
+        <result property="id"    column="sub_id"    />
+        <result property="druginId"    column="sub_drugin_id"    />
+        <result property="drugName"    column="sub_drug_name"    />
+        <result property="drugPackage"    column="sub_drug_package"    />
+        <result property="drugPackingunit"    column="sub_drug_packingunit"    />
+        <result property="drugCount"    column="sub_drug_count"    />
+        <result property="drugPrice"    column="sub_drug_price"    />
+        <result property="drugOrder"    column="sub_drug_order"    />
+        <result property="drugValiddate"    column="sub_drug_validdate"    />
+        <result property="drugType"    column="sub_drug_type"    />
+        <result property="remark"    column="sub_remark"    />
+        <result property="drugId"    column="sub_drug_id"    />
+    </resultMap>
+
+    <sql id="selectDruginVo">
+        select id, in_status, in_type, in_orderid, in_date, create_by, create_time, update_time, update_by, isvalid, remark from drugin
+    </sql>
+
+    <select id="selectDruginList" parameterType="Drugin" resultMap="DruginResult">
+        <include refid="selectDruginVo"/>
+        <where>
+            <if test="inStatus != null  and inStatus != ''"> and in_status = #{inStatus}</if>
+            <if test="inType != null  and inType != ''"> and in_type = #{inType}</if>
+            <if test="inOrderid != null "> and in_orderid = #{inOrderid}</if>
+            <if test="params.beginInDate != null and params.beginInDate != '' and params.endInDate != null and params.endInDate != ''"> and in_date between #{params.beginInDate} and #{params.endInDate}</if>
+        </where>
+    </select>
+
+    <select id="selectDruginById" parameterType="Long" resultMap="DruginDrugindetailResult">
+        select a.id, a.in_status, a.in_type, a.in_orderid, a.in_date, a.create_by, a.create_time, a.update_time, a.update_by, a.isvalid, a.remark,
+               b.id as sub_id, b.drugin_id as sub_drugin_id,b.drug_type as sub_drug_type, b.drug_name as sub_drug_name, b.drug_package as sub_drug_package, b.drug_count as sub_drug_count, b.drug_price as sub_drug_price,
+               b.drug_order as sub_drug_order, b.drug_validdate as sub_drug_validdate, b.remark as sub_remark,b.drug_packingunit as sub_drug_packingunit,b.drug_id assub_drug_id
+        from drugin a
+                 left join drugindetail b on b.drugin_id = a.id
+        where a.id = #{id}
+    </select>
+
+    <insert id="insertDrugin" parameterType="Drugin" useGeneratedKeys="true" keyProperty="id">
+        insert into drugin
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="inStatus != null">in_status,</if>
+            <if test="inType != null">in_type,</if>
+            <if test="inOrderid != null">in_orderid,</if>
+            <if test="inDate != null">in_date,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="isvalid != null">isvalid,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="inStatus != null">#{inStatus},</if>
+            <if test="inType != null">#{inType},</if>
+            <if test="inOrderid != null">#{inOrderid},</if>
+            <if test="inDate != null">#{inDate},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="isvalid != null">#{isvalid},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateDrugin" parameterType="Drugin">
+        update drugin
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="inStatus != null">in_status = #{inStatus},</if>
+            <if test="inType != null">in_type = #{inType},</if>
+            <if test="inOrderid != null">in_orderid = #{inOrderid},</if>
+            <if test="inDate != null">in_date = #{inDate},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="isvalid != null">isvalid = #{isvalid},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDruginById" parameterType="Long">
+        delete from drugin where id = #{id}
+    </delete>
+
+    <delete id="deleteDruginByIds" parameterType="String">
+        delete from drugin where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteDrugindetailByDruginIds" parameterType="String">
+        delete from drugindetail where drugin_id in
+        <foreach item="druginId" collection="array" open="(" separator="," close=")">
+            #{druginId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteDrugindetailByDruginId" parameterType="Long">
+        delete from drugindetail where drugin_id = #{druginId}
+    </delete>
+
+    <insert id="batchDrugindetail">
+        insert into drugindetail( id, drugin_id, drug_name, drug_package, drug_count, drug_price, drug_order, drug_validdate, remark,drug_type,drug_packingunit,drug_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.id}, #{item.druginId}, #{item.drugName}, #{item.drugPackage}, #{item.drugCount}, #{item.drugPrice}, #{item.drugOrder}, #{item.drugValiddate}, #{item.remark},#{item.drugType},#{item.drugPackingunit},#{item.drugId})
+        </foreach>
+    </insert>
+</mapper>

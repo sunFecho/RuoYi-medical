@@ -57,12 +57,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="isvalid != null "> and isvalid = #{isvalid}</if>
             <if test="createDate != null "> and create_date = #{createDate}</if>
             <if test="updateDate != null "> and update_date = #{updateDate}</if>
+             and isvalid = 1
         </where>
     </select>
     
     <select id="selectDruginfoById" parameterType="Long" resultMap="DruginfoResult">
         <include refid="selectDruginfoVo"/>
-        where id = #{id}
+        where id = #{id} and isvalid = 1
     </select>
         
     <insert id="insertDruginfo" parameterType="Druginfo" useGeneratedKeys="true" keyProperty="id">
@@ -147,13 +148,19 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </update>
 
     <delete id="deleteDruginfoById" parameterType="Long">
-        delete from druginfo where id = #{id}
+        update druginfo set isvalid = 0 where id = #{id}
+
     </delete>
 
     <delete id="deleteDruginfoByIds" parameterType="String">
-        delete from druginfo where id in 
+        update druginfo set isvalid = 0 where id in
         <foreach item="id" collection="array" open="(" separator="," close=")">
             #{id}
         </foreach>
     </delete>
+
+    <select id="selectDruginfoBydrugId" parameterType="Long" resultMap="DruginfoResult">
+        <include refid="selectDruginfoVo"/>
+        where drug_id = #{drugId} and isvalid = 1
+    </select>
 </mapper>

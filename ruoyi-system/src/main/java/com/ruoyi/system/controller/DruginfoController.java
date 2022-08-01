@@ -2,6 +2,8 @@ package com.ruoyi.system.controller;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import com.ruoyi.common.utils.DateUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -77,6 +79,9 @@ public class DruginfoController extends BaseController
     @PostMapping
     public AjaxResult add(@RequestBody Druginfo druginfo)
     {
+        druginfo.setCreateBy(getUsername());
+        druginfo.setCreateDate(DateUtils.getNowDate());
+
         return toAjax(druginfoService.insertDruginfo(druginfo));
     }
 
@@ -88,6 +93,8 @@ public class DruginfoController extends BaseController
     @PutMapping
     public AjaxResult edit(@RequestBody Druginfo druginfo)
     {
+        druginfo.setUpdateBy(getUsername());
+        druginfo.setUpdateDate(DateUtils.getNowDate());
         return toAjax(druginfoService.updateDruginfo(druginfo));
     }
 
@@ -101,4 +108,8 @@ public class DruginfoController extends BaseController
     {
         return toAjax(druginfoService.deleteDruginfoByIds(ids));
     }
+
+
+
+
 }

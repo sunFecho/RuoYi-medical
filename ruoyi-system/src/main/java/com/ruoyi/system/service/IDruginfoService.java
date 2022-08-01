@@ -58,4 +58,7 @@ public interface IDruginfoService
      * @return 结果
      */
     public int deleteDruginfoById(Long id);
+
+
+    Druginfo selectDruginfoBydrugId(Long drugId);
 }

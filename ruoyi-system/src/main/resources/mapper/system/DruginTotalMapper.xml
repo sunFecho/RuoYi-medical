@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DruginTotalMapper">
+
+    <resultMap type="DruginTotal" id="DruginTotalResult">
+        <result property="id"    column="id"    />
+        <result property="inStatus"    column="in_status"    />
+        <result property="inType"    column="in_type"    />
+        <result property="inOrderid"    column="in_orderid"    />
+        <result property="inDate"    column="in_date"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="isvalid"    column="isvalid"    />
+        <result property="remark"    column="remark"    />
+        <result property="druginId"    column="drugin_id"    />
+        <result property="drugName"    column="drug_name"    />
+        <result property="drugPackage"    column="drug_package"    />
+        <result property="drugPackingunit"    column="drug_packingunit"    />
+        <result property="drugCount"    column="drug_count"    />
+        <result property="drugPrice"    column="drug_price"    />
+        <result property="drugOrder"    column="drug_order"    />
+        <result property="drugValiddate"    column="drug_validdate"    />
+        <result property="drugType"    column="drug_type"    />
+        <result property="remarkDetail"    column="remarkDetail"    />
+        <result property="total"    column="total"    />
+        <result property="drugId"    column="drug_id"    />
+    </resultMap>
+
+
+    <select id="selectDruginTotalList" parameterType="DruginTotal" resultMap="DruginTotalResult">
+        select a.id, a.in_status, a.in_type, a.in_orderid, a.in_date, a.create_by, a.create_time, a.update_time, a.update_by, a.isvalid, a.remark,
+               b.id as sub_id, b.drugin_id,b.drug_type , b.drug_name, b.drug_package , b.drug_count ,
+               b.drug_price , b.drug_order , b.drug_validdate ,
+               b.remark as remarkDetail,b.drug_packingunit,b.drug_count*b.drug_price as total,
+               b.drug_id
+        from drugin a
+                 inner join drugindetail b on b.drugin_id = a.id
+        <where>
+            <if test="inType != null  and inType != ''"> and a.in_type = #{inType}</if>
+            <if test="inStatus != null  and inStatus != ''"> and a.in_status = #{inStatus}</if>
+            <if test="drugName != null  and drugName != ''"> and b.drug_name like concat('%', #{drugName}, '%')</if>
+            <if test="inOrderid != null "> and a.in_orderid = #{inOrderid}</if>
+            <if test="params.beginInDate != null and params.beginInDate != '' and params.endInDate != null and params.endInDate != ''"> and a.in_date between #{params.beginInDate} and #{params.endInDate}</if>
+        </where>
+    </select>
+
+</mapper>

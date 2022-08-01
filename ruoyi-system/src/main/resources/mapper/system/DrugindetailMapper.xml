@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DrugindetailMapper">
+
+    <resultMap type="Drugindetail" id="DrugindetailResult">
+        <result property="id"    column="id"    />
+        <result property="druginId"    column="drugin_id"    />
+        <result property="drugName"    column="drug_name"    />
+        <result property="drugPackage"    column="drug_package"    />
+        <result property="drugCount"    column="drug_count"    />
+        <result property="drugPrice"    column="drug_price"    />
+        <result property="drugOrder"    column="drug_order"    />
+        <result property="drugValiddate"    column="drug_validdate"    />
+        <result property="drugPackingunit"    column="drug_packingunit"    />
+        <result property="remark"    column="remark"    />
+        <result property="drugType"    column="drug_type"    />
+    </resultMap>
+
+    <sql id="selectDrugindetailVo">
+        select id, drugin_id, drug_name, drug_package, drug_count, drug_price, drug_order,drug_type, drug_validdate,drug_packingunit, remark from drugindetail
+    </sql>
+
+    <select id="selectDrugindetailList" parameterType="Drugindetail" resultMap="DrugindetailResult">
+        <include refid="selectDrugindetailVo"/>
+        <where>
+            <if test="druginId != null "> and drugin_id = #{druginId}</if>
+            <if test="drugName != null  and drugName != ''"> and drug_name like concat('%', #{drugName}, '%')</if>
+            <if test="drugPackage != null  and drugPackage != ''"> and drug_package = #{drugPackage}</if>
+            <if test="drugCount != null "> and drug_count = #{drugCount}</if>
+            <if test="drugPrice != null "> and drug_price = #{drugPrice}</if>
+            <if test="drugOrder != null  and drugOrder != ''"> and drug_order = #{drugOrder}</if>
+            <if test="drugType != null  and drugType != ''"> and drug_type = #{drugType}</if>
+            <if test="drugValiddate != null "> and drug_validdate = #{drugValiddate}</if>
+        </where>
+    </select>
+
+    <select id="selectDrugindetailById" parameterType="Long" resultMap="DrugindetailResult">
+        <include refid="selectDrugindetailVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertDrugindetail" parameterType="Drugindetail" useGeneratedKeys="true" keyProperty="id">
+        insert into drugindetail
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="druginId != null">drugin_id,</if>
+            <if test="drugName != null">drug_name,</if>
+            <if test="drugType != null">drug_type,</if>
+            <if test="drugPackage != null">drug_package,</if>
+            <if test="drugCount != null">drug_count,</if>
+            <if test="drugPrice != null">drug_price,</if>
+            <if test="drugOrder != null">drug_order,</if>
+            <if test="drugValiddate != null">drug_validdate,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="druginId != null">#{druginId},</if>
+            <if test="drugType != null">#{drugType},</if>
+            <if test="drugName != null">#{drugName},</if>
+            <if test="drugPackage != null">#{drugPackage},</if>
+            <if test="drugCount != null">#{drugCount},</if>
+            <if test="drugPrice != null">#{drugPrice},</if>
+            <if test="drugOrder != null">#{drugOrder},</if>
+            <if test="drugValiddate != null">#{drugValiddate},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateDrugindetail" parameterType="Drugindetail">
+        update drugindetail
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="druginId != null">drugin_id = #{druginId},</if>
+            <if test="drugName != null">drug_name = #{drugName},</if>
+            <if test="drugPackage != null">drug_package = #{drugPackage},</if>
+            <if test="drugType != null "> drug_type = #{drugType}</if>
+            <if test="drugCount != null">drug_count = #{drugCount},</if>
+            <if test="drugPrice != null">drug_price = #{drugPrice},</if>
+            <if test="drugOrder != null">drug_order = #{drugOrder},</if>
+            <if test="drugValiddate != null">drug_validdate = #{drugValiddate},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDrugindetailById" parameterType="Long">
+        delete from drugindetail where id = #{id}
+    </delete>
+
+    <delete id="deleteDrugindetailByIds" parameterType="String">
+        delete from drugindetail where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
