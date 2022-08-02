@@ -108,6 +108,11 @@ public class DrugoutServiceImpl implements IDrugoutService
         return drugoutMapper.deleteDrugoutById(id);
     }
 
+    @Override
+    public int changeStatusByid(Long id) {
+        return drugoutMapper.changeStatusByid(id);
+    }
+
     /**
      * 新增出库详情信息
      * 

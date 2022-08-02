@@ -101,4 +101,10 @@ public class DruginController extends BaseController
     {
         return toAjax(druginService.deleteDruginByIds(ids));
     }
+
+    @GetMapping("/editStatusFinish/{id}")
+    public AjaxResult changeStatus(@PathVariable("id") Long id)
+    {
+        return toAjax(druginService.changeStatusByid(id));
+    }
 }

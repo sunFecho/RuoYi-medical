@@ -38,7 +38,7 @@
             INNER JOIN drugoutdetail b ON b.drugout_id = a.id
             )c
     </select>
-    <select id="selectSumsock" parameterType="SumDrugin" resultMap="SumDruginResult">
+    <select id="selectStockSum" parameterType="SumDrugin" resultMap="SumDruginResult">
         SELECT
             sum( c.total ) AS sum,
             sum( c.drug_count ) AS sumcount

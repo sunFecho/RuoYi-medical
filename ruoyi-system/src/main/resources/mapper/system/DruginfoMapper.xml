@@ -59,8 +59,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="updateDate != null "> and update_date = #{updateDate}</if>
              and isvalid = 1
         </where>
+        order by sort asc
     </select>
-    
+
     <select id="selectDruginfoById" parameterType="Long" resultMap="DruginfoResult">
         <include refid="selectDruginfoVo"/>
         where id = #{id} and isvalid = 1

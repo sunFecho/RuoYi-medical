@@ -82,6 +82,8 @@ public class DrugindetailController extends BaseController
 
     /**
      * 修改入库详情
+     *
+     *
      */
     @PreAuthorize("@ss.hasPermi('system:drugindetail:edit')")
     @Log(title = "入库详情", businessType = BusinessType.UPDATE)
@@ -101,4 +103,6 @@ public class DrugindetailController extends BaseController
     {
         return toAjax(drugindetailService.deleteDrugindetailByIds(ids));
     }
+
+
 }

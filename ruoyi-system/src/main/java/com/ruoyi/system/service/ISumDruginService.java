@@ -8,4 +8,6 @@ public interface ISumDruginService {
     List<SumDrugin> selectSum(SumDrugin sumDrugin);
 
     List<SumDrugin> selectSumout(SumDrugin sumDrugin);
+
+    List<SumDrugin> selectStockSum(SumDrugin sumDrugin);
 }

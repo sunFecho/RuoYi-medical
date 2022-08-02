@@ -3,6 +3,7 @@ package com.ruoyi.system.mapper;
 import java.util.List;
 import com.ruoyi.system.domain.Drugout;
 import com.ruoyi.system.domain.Drugoutdetail;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 药品出库Mapper接口
@@ -10,6 +11,7 @@ import com.ruoyi.system.domain.Drugoutdetail;
  * @author sf
  * @date 2022-07-29
  */
+@Mapper
 public interface DrugoutMapper 
 {
     /**
@@ -84,4 +86,6 @@ public interface DrugoutMapper
      * @return 结果
      */
     public int deleteDrugoutdetailByDrugoutId(Long id);
+
+    int changeStatusByid(Long id);
 }

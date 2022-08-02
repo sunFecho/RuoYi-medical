@@ -56,3 +56,9 @@ export function listDruginSum(query) {
     params: query
   })
 }
+export function changeStatusin(id) {
+  return request({
+    url: '/system/drugin/editStatusFinish/'+id,
+    method: 'get',
+  })
+}

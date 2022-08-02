@@ -108,6 +108,12 @@ public class DruginServiceImpl implements IDruginService
         return druginMapper.deleteDruginById(id);
     }
 
+    @Override
+    public int changeStatusByid(Long id) {
+        return druginMapper.changeStatusByid(id);
+
+    }
+
     /**
      * 新增入库详情信息
      * 

@@ -58,4 +58,6 @@ public interface IDrugoutService
      * @return 结果
      */
     public int deleteDrugoutById(Long id);
+
+    int changeStatusByid(Long id);
 }

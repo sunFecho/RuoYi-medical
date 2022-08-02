@@ -25,38 +25,7 @@
     </el-form>
 
     <el-row :gutter="10" class="mb8">
-<!--      <el-col :span="1.5">-->
-<!--        <el-button-->
-<!--          type="primary"-->
-<!--          plain-->
-<!--          icon="el-icon-plus"-->
-<!--          size="mini"-->
-<!--          @click="handleAdd"-->
-<!--          v-hasPermi="['system:drugstock:add']"-->
-<!--        >新增</el-button>-->
-<!--      </el-col>-->
-<!--      <el-col :span="1.5">-->
-<!--        <el-button-->
-<!--          type="success"-->
-<!--          plain-->
-<!--          icon="el-icon-edit"-->
-<!--          size="mini"-->
-<!--          :disabled="single"-->
-<!--          @click="handleUpdate"-->
-<!--          v-hasPermi="['system:drugstock:edit']"-->
-<!--        >修改</el-button>-->
-<!--      </el-col>-->
-<!--      <el-col :span="1.5">-->
-<!--        <el-button-->
-<!--          type="danger"-->
-<!--          plain-->
-<!--          icon="el-icon-delete"-->
-<!--          size="mini"-->
-<!--          :disabled="multiple"-->
-<!--          @click="handleDelete"-->
-<!--          v-hasPermi="['system:drugstock:remove']"-->
-<!--        >删除</el-button>-->
-<!--      </el-col>-->
+
       <el-col :span="1.5">
         <el-button
           type="warning"
@@ -70,7 +39,7 @@
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
-    <el-table v-loading="loading" :data="drugstockList">
+    <el-table v-loading="loading" :data="drugstockList" show-summary :summary-method="getSummaries">
       <el-table-column
         type="index"
         width="50">
@@ -85,7 +54,11 @@
       <el-table-column label="当前库存" align="center" prop="drugCount" />
       <el-table-column label="单价" align="center" prop="drugPrice" />
       <el-table-column label="包装单位" align="center" prop="drugPackingunit" />
-      <el-table-column label="总价" align="center" prop="total" />
+      <el-table-column label="总价" align="center" prop="total" >
+        <template slot-scope="scope">
+        {{scope.row.drugCount * scope.row.drugPrice}}
+        </template>
+      </el-table-column>
       <el-table-column label="批次号" align="center" prop="drugOrder" />
       <el-table-column label="有效期" align="center" prop="drugValiddate" width="180">
         <template slot-scope="scope">
@@ -169,7 +142,14 @@
 </template>
 
 <script>
-import { listDrugstock, getDrugstock, delDrugstock, addDrugstock, updateDrugstock } from "@/api/system/drugstock";
+import {
+  listDrugstock,
+  getDrugstock,
+  delDrugstock,
+  addDrugstock,
+  updateDrugstock,
+  listStockSum
+} from "@/api/system/drugstock";
 
 export default {
   name: "Drugstock",
@@ -213,7 +193,8 @@ export default {
       form: {},
       // 表单校验
       rules: {
-      }
+      },
+      sumlist:[],
     };
   },
   created() {
@@ -227,6 +208,9 @@ export default {
         this.drugstockList = response.rows;
         this.total = response.total;
         this.loading = false;
+      });
+      listStockSum().then(res => {
+        this.sumlist = res.rows[0]
       });
     },
     // 取消按钮
@@ -319,6 +303,26 @@ export default {
       this.download('system/drugstock/export', {
         ...this.queryParams
       }, `drugstock_${new Date().getTime()}.xlsx`)
+    },
+    getSummaries(param){
+      const { columns, data } = param;
+      const sums = [];
+      columns.forEach((column, index) => {
+        if (index === 6) {
+          sums[index] = this.sumlist.sumcount;
+          return;
+        }else if(index === 9){
+          sums[index] = this.sumlist.sumall;
+          return;
+        }else if(index === 5){
+          sums[index] = '合计';
+          return;
+        }else{
+          sums[index] = '';
+          return;
+        }
+      });
+      return sums;
     }
   }
 };

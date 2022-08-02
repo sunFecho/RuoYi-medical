@@ -33,5 +33,11 @@ public class SumDruginController extends BaseController {
         List<SumDrugin> list = sumDruginService.selectSumout(sumDrugin);
         return getDataTable(list);
     }
+    @GetMapping("/StockSum")
+    public TableDataInfo listStockSum(SumDrugin sumDrugin)
+    {
+        List<SumDrugin> list = sumDruginService.selectStockSum(sumDrugin);
+        return getDataTable(list);
+    }
 
 }

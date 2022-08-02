@@ -58,4 +58,6 @@ public interface IDruginService
      * @return 结果
      */
     public int deleteDruginById(Long id);
+
+    int changeStatusByid(Long id);
 }

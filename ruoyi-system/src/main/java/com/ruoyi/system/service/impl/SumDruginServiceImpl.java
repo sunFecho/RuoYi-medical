@@ -22,4 +22,9 @@ public class SumDruginServiceImpl implements ISumDruginService {
     public List<SumDrugin> selectSumout(SumDrugin sumDrugin) {
         return sumDruginMapper.selectSumout(sumDrugin);
     }
+
+    @Override
+    public List<SumDrugin> selectStockSum(SumDrugin sumDrugin) {
+        return sumDruginMapper.selectStockSum(sumDrugin);
+    }
 }

@@ -84,4 +84,6 @@ public interface DruginMapper
      * @return 结果
      */
     public int deleteDrugindetailByDruginId(Long id);
+
+    int changeStatusByid(Long id);
 }

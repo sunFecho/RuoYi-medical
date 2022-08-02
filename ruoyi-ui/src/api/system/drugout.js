@@ -58,3 +58,10 @@ export function listDrugoutSum(query) {
     params: query
   })
 }
+
+export function changeStatus(id) {
+  return request({
+    url: '/system/drugout/editStatusFinish/'+id,
+    method: 'get',
+  })
+}

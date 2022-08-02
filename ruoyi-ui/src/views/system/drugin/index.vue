@@ -99,6 +99,17 @@
       </el-col>
       <el-col :span="1.5">
         <el-button
+          type="success"
+          plain
+          icon="el-icon-edit"
+          size="mini"
+          :disabled="single"
+          @click="handlein"
+          v-hasPermi="['system:drugin:edit']"
+        >确认入库</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button
           type="danger"
           plain
           icon="el-icon-delete"
@@ -218,9 +229,17 @@
             <el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDeleteDrugindetail">删除</el-button>
           </el-col>
         </el-row>
-        <el-table :data="drugindetailList" @selection-change="handleDrugindetailSelectionChange" :row-class-name="rowDrugindetailIndex" ref="drugindetail" border>
+        <el-table :data="form.drugindetailList" @selection-change="handleDrugindetailSelectionChange" :row-class-name="rowDrugindetailIndex" ref="drugindetail" border>
           <el-table-column type="selection" width="50" align="center" />
           <el-table-column label="序号" align="center" prop="index" width="50"/>
+
+          <el-table-column label="药品编号" prop="drugId" width="100">
+            <template slot-scope="scope">
+              {{scope.row.drugId}}
+              <!--              <el-input v-model="scope.row.drugType" placeholder="请输入药品名称" />-->
+            </template>
+          </el-table-column>
+
           <el-table-column label="药品类型" prop="drugType" width="120">
             <template slot-scope="scope">
               {{scope.row.drugType}}
@@ -242,17 +261,14 @@
           <el-table-column label="数量*" prop="drugCount" width="130" >
             <template slot-scope="scope">
 <!--              <el-form ref="form" :model="form">-->
-<!--              <el-form-item prop="drugCount" :rules="rules1" label-width="0"  style="margin-bottom: 0;">-->
+<!--              label-width="0"  style="margin-bottom: 0;"-->
+              <el-form-item :prop="'drugindetailList.'+ scope.$index +'.drugCount'" :rules="rules1.drugCount" label-width="0"  style="margin-bottom: 0;">
               <el-input-number :controls="false" v-model="scope.row.drugCount" placeholder="请输入数量" :style="{width:'100px'}"/>
-<!--              </el-form-item>-->
+              </el-form-item>
 <!--              </el-form>-->
+
+
             </template>
-
-
-<!--            <el-form-item :prop="'drugindetailList.' + scope.$index +'.drugCount'" :rules="rules.brebroodsList.malenum" label-width="0"  style="margin-bottom: 0;">-->
-<!--              <el-input-number :controls="false" placeholder="请输入公鸡数" v-model="scope.row.malenum"  />-->
-<!--            </el-form-item>-->
-
 
           </el-table-column>
           <el-table-column label="单位" prop="drugPackingunit" width="50">
@@ -274,17 +290,18 @@
             <template slot-scope="scope">
 <!--              <el-form >-->
 <!--                <el-form-item prop="drugOrder" :rules="[{required: true, message: '不能为空', trigger: 'blur' }]">-->
+              <el-form-item :prop="'drugindetailList.'+ scope.$index +'.drugOrder'" :rules="rules1.drugOrder" label-width="0"  style="margin-bottom: 0;">
               <el-input v-model="scope.row.drugOrder" placeholder="请输入批次号" />
-<!--                </el-form-item>-->
+                </el-form-item>
 <!--              </el-form>-->
             </template>
           </el-table-column>
           <el-table-column label="有效期*" prop="drugValiddate" width="240">
             <template slot-scope="scope">
 <!--              <el-form>-->
-<!--                <el-form-item prop="drugValiddate" :rules="[{required: true, message: '不能为空', trigger: 'blur' }]">-->
+              <el-form-item :prop="'drugindetailList.'+ scope.$index +'.drugValiddate'" :rules="rules1.drugOrder" label-width="0"  style="margin-bottom: 0;">
               <el-date-picker clearable v-model="scope.row.drugValiddate" type="date" value-format="yyyy-MM-dd" placeholder="请选择有效期" />
-<!--                </el-form-item>-->
+                </el-form-item>
 <!--              </el-form>-->
             </template>
           </el-table-column>
@@ -345,7 +362,7 @@ import {
   addDrugin,
   updateDrugin,
   listDruginTotal,
-  listDruginSum
+  listDruginSum, changeStatusin
 } from "@/api/system/drugin";
 import {getDruginfo, listDruginfo} from "@/api/system/druginfo";
 import {addDrugstock, listDrugstock, updateDrugstock} from "@/api/system/drugstock";
@@ -414,14 +431,87 @@ export default {
           message: '数量不能为空',
           trigger: 'blur'
         }],
+        drugOrder: [{
+          required: true,
+          message: '不能为空',
+          trigger: 'blur'
+        }],
       },
       totallist:[],
+      inStatus:[],
     };
   },
   created() {
     this.getList();
   },
   methods: {
+    handlein(){
+      const id =this.ids[0];
+      const instatus = this.inStatus[0]
+      console.log(id)
+      console.log(instatus)
+      if (instatus ==="未入库"){
+        changeStatusin(id).then(response => {
+        });
+          getDrugin(id).then((response) => {
+            this.form = response.data;
+            this.drugindetailList = response.data.drugindetailList;
+            if (this.drugindetailList.length>0){
+              for (let i=0;i<this.drugindetailList.length;i++){
+                console.log(this.drugindetailList[i].drugId)
+                let params2={
+                  drugId: this.drugindetailList[i].drugId,
+                }
+                listDruginfo(params2).then(res =>{
+                  let paramssave={
+                    drugId:this.drugindetailList[i].drugId,
+                    drugName:res.rows[0].drugName,
+                    drugEngname:res.rows[0].drugEngname,
+                    drugType:res.rows[0].drugType,
+                    drugPackage:res.rows[0].drugPackage,
+                    drugPrice:this.drugindetailList[i].drugPrice,
+                    drugPackingunit:this.drugindetailList[i].drugPackingunit,
+                    drugOrder:this.drugindetailList[i].drugOrder,
+                    drugValiddate:this.drugindetailList[i].drugValiddate,
+                    drugFactory:res.rows[0].drugFactory
+                  }
+                  let count =this.drugindetailList[i].drugCount
+                  listDrugstock(paramssave).then(response=>{
+                    //判断数据库是否存在这条相似的数据
+                    if(response.rows.length==0){
+                      //没有相似数据 存入数据
+                      paramssave.drugCount = count
+                      addDrugstock(paramssave).then(res1 =>{
+
+                      })
+                    }else{
+                      //有相似数据 修改数据
+                      let num=response.rows[0].drugCount - 0
+                      let change1={
+                        id:response.rows[0].id,
+                        drugCount:count+num
+                      }
+                      updateDrugstock(change1).then(res =>{
+
+                      })
+
+                    }
+                  })
+
+                })
+              }
+              this.$modal.msgSuccess("入库成功");
+              this.getList();
+            }
+            else {
+              this.$modal.msgSuccess("无效数据");
+            }
+          });
+      }else{
+        this.$modal.msgWarning("此状态无法操作");
+      }
+
+    },
     dialogclose(){
       this.$refs.leftTab.clearSelection();
       this.open1 = false;
@@ -444,10 +534,12 @@ export default {
         obj.remark = "";
         this.drugindetailList.push(obj);
       }
+      this.form.drugindetailList =this.drugindetailList;
       this.open1 = false;
       this.$refs.leftTab.clearSelection();
       // console.log('print')
-      // console.log(this.rightlists)
+      // console.log(this.drugindetailList)
+
     },
     cancel1(){
       this.$refs.leftTab.clearSelection();
@@ -531,6 +623,7 @@ export default {
     // 多选框选中数据
     handleSelectionChange(selection) {
       this.ids = selection.map(item => item.id)
+      this.inStatus = selection.map(item => item.inStatus)
       this.single = selection.length!==1
       this.multiple = !selection.length
     },
@@ -569,21 +662,26 @@ export default {
       // this.isdisabled = true;
       this.reset();
       const id = row.id || this.ids
-      getDrugin(id).then(response => {
-        this.form = response.data;
-        this.drugindetailList = response.data.drugindetailList;
-        this.open = true;
-        this.title = "修改药品入库";
-      });
+      const instatus = this.inStatus[0]
+      if(instatus ==="已入库"){
+        this.$modal.msgWarning("无法修改")
+      }else{
+        getDrugin(id).then(response => {
+          this.form = response.data;
+          this.drugindetailList = response.data.drugindetailList;
+          this.open = true;
+          this.title = "修改药品入库";
+        });
+      }
+
     },
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-              this.form.drugindetailList = this.drugindetailList;
-              // console.log(this.form.drugindetailList)
+          // this.form.drugindetailList =this.drugindetailList ;
           this.form.inStatus="未入库";
-              if (this.form.id != null) {
+          if (this.form.id != null) {
                 updateDrugin(this.form).then(response => {
                   this.$modal.msgSuccess("修改成功");
                   this.open = false;
@@ -602,19 +700,66 @@ export default {
     submitForm1() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          this.form.drugindetailList = this.drugindetailList;
+          // this.form.drugindetailList = this.drugindetailList;
           if (this.form.id != null) {
+            this.form.inStatus="已入库";
             updateDrugin(this.form).then(response => {
+            });
+            if (this.drugindetailList.length>0){
+              for (let i=0;i<this.drugindetailList.length;i++){
+                console.log(this.drugindetailList[i].drugId)
+                let params2={
+                  drugId: this.drugindetailList[i].drugId,
+                }
+                listDruginfo(params2).then(res =>{
+                  let paramssave={
+                    drugId:this.drugindetailList[i].drugId,
+                    drugName:res.rows[0].drugName,
+                    drugEngname:res.rows[0].drugEngname,
+                    drugType:res.rows[0].drugType,
+                    drugPackage:res.rows[0].drugPackage,
+                    drugPrice:this.drugindetailList[i].drugPrice,
+                    drugPackingunit:this.drugindetailList[i].drugPackingunit,
+                    drugOrder:this.drugindetailList[i].drugOrder,
+                    drugValiddate:this.drugindetailList[i].drugValiddate,
+                    drugFactory:res.rows[0].drugFactory
+                  }
+                  let count =this.drugindetailList[i].drugCount
+                  listDrugstock(paramssave).then(response=>{
+                    //判断数据库是否存在这条相似的数据
+                    if(response.rows.length==0){
+                      //没有相似数据 存入数据
+                      paramssave.drugCount = count
+                      addDrugstock(paramssave).then(res1 =>{
+
+                      })
+                    }else{
+                      //有相似数据 修改数据
+                      let num=response.rows[0].drugCount - 0
+                      let change1={
+                        id:response.rows[0].id,
+                        drugCount:count+num
+                      }
+                      updateDrugstock(change1).then(res =>{
+
+                      })
+
+                    }
+                  })
+
+                })
+              }
               this.$modal.msgSuccess("修改成功");
               this.open = false;
               this.getList();
-            });
+            }else {
+              this.$modal.msgSuccess("无效数据");
+            }
           } else {
-            console.log(this.form.drugindetailList)
+            // console.log(this.form.drugindetailList)
             this.form.inStatus="已入库";
-            // console.log(this.form)
-            // console.log(this.drugindetailList)
-            console.log(this.drugindetailList.length)
+            addDrugin(this.form).then(response => {
+            });
             if (this.drugindetailList.length>0){
             for (let i=0;i<this.drugindetailList.length;i++){
               console.log(this.drugindetailList[i].drugId)
@@ -641,11 +786,7 @@ export default {
                     //没有相似数据 存入数据
                     paramssave.drugCount = count
                     addDrugstock(paramssave).then(res1 =>{
-                      addDrugin(this.form).then(response => {
-                        this.$modal.msgSuccess("新增成功");
-                        this.open = false;
-                        this.getList();
-                      });
+
                     })
                   }else{
                     //有相似数据 修改数据
@@ -654,18 +795,18 @@ export default {
                       id:response.rows[0].id,
                       drugCount:count+num
                     }
-                    updateDrugstock(change1)
-                    addDrugin(this.form).then(response => {
-                      this.$modal.msgSuccess("新增成功");
-                      this.open = false;
-                      this.getList();
-                    });
+                    updateDrugstock(change1).then(res =>{
+
+                    })
+
                   }
                 })
 
               })
-
             }
+              this.$modal.msgSuccess("新增成功");
+              this.open = false;
+              this.getList();
             }else {
                 this.$modal.msgSuccess("无效数据");
             }

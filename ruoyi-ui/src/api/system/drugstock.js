@@ -49,3 +49,10 @@ export function listDrugstocklimit(query) {
     params: query
   })
 }
+
+export function listStockSum() {
+  return request({
+    url: '/system/sumdrug//StockSum',
+    method: 'get',
+  })
+}

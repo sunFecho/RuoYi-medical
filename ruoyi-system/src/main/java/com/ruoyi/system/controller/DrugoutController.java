@@ -101,4 +101,11 @@ public class DrugoutController extends BaseController
     {
         return toAjax(drugoutService.deleteDrugoutByIds(ids));
     }
+
+
+    @GetMapping("/editStatusFinish/{id}")
+    public AjaxResult changeStatus(@PathVariable("id") Long id)
+    {
+        return toAjax(drugoutService.changeStatusByid(id));
+    }
 }
