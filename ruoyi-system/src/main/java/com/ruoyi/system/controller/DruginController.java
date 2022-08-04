@@ -46,6 +46,7 @@ public class DruginController extends BaseController
         return getDataTable(list);
     }
 
+
     /**
      * 导出药品入库列表
      */

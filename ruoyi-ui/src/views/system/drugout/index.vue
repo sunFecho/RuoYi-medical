@@ -126,7 +126,7 @@
           plain
           icon="el-icon-download"
           size="mini"
-          @click="handletest"
+          @click="handletest1"
           v-hasPermi="['system:drugout:export']"
         >test</el-button>
       </el-col>
@@ -416,21 +416,117 @@ export default {
         }],
       },
       totallist:[],
+      data:{
+        flag:0,
+      }
     };
+
   },
   created() {
     this.getList();
 
   },
   methods: {
-    handletest(){
-      if(0==0){
-      let flag = 0
-      for (let i=0;i<5;i++){
-            flag=flag+1;
+    getNowTime() {
+      var now = new Date();
+      var year = now.getFullYear(); //得到年份
+      var month = now.getMonth(); //得到月份
+      var date = now.getDate(); //得到日期
+      var hour =" 00:00:00"; //默认时分秒 如果传给后台的格式为年月日时分秒，就需要加这个，如若不需要，此行可忽略
+      month = month + 1;
+      month = month.toString().padStart(2, "0");
+      date = date.toString().padStart(2, "0");
+      var defaultDate = `${year}-${month}-${date}${hour}`;
+      return defaultDate;
+      // this.$set(this.info, "stockDate", defaultDate);
+    },
+    handletest1(){
+      var defaultDate = this.getNowTime();
+      this.$set(this.form, "outDate", defaultDate);
+      // this.form.outDate=this.getNowTime()
+      console.log(this.form.outDate)
+      this.open = true
+    },
+
+    async handletest(){
+      this.reset();
+      this.flag=0;
+      const id = this.ids[0]
+      console.log(id)
+      const outStatus = this.outStatus[0]
+      console.log(outStatus)
+      if(outStatus==="未出库"){
+        await getDrugout(id).then(response => {
+          this.form = response.data;
+          this.drugoutdetailList = response.data.drugoutdetailList;
+         });
+           let flag = 0;
+            for (let i = 0; i < this.drugoutdetailList.length; i++) {
+              // console.log(this.drugoutdetailList[i].drugId)
+              // console.log(this.drugoutdetailList[i])
+              let paramssearch = {
+                drugId: this.drugoutdetailList[i].drugId,
+                drugName: this.drugoutdetailList[i].drugName,
+                drugPrice: this.drugoutdetailList[i].drugPrice,
+                drugOrder: this.drugoutdetailList[i].drugOrder,
+                drugValiddate: this.drugoutdetailList[i].drugValiddate,
+              }
+              await listDrugstock(paramssearch).then(res => {
+                // console.log(res.rows.length)
+                // console.log(this.drugoutdetailList[i].drugCount)
+                if(res.rows.length > 0){
+                  let changeParams = {
+                    id: res.rows[0].id,
+                    drugCount: res.rows[0].drugCount - this.drugoutdetailList[i].drugCount
+                  }
+                  console.log("count"+i+":"+changeParams.drugCount )
+                  if(changeParams.drugCount<0){
+                    flag=flag+1
+                  }
+                  // updateDrugstock(changeParams);
+                  // this.$modal.msgSuccess("出库成功");
+                  // this.getList();
+                }else{
+                  this.$modal.msgWarning("存在库存中未登记商品");
+                }
+              })
+            }
+            //对上面进行flag判断
+            if(flag !=0){
+              this.$modal.msgWarning("存在库存不足物品");
+            }else {
+              await changeStatus(id);
+              for (let i = 0; i < this.drugoutdetailList.length; i++) {
+                let paramssearch = {
+                  drugId: this.drugoutdetailList[i].drugId,
+                  drugName: this.drugoutdetailList[i].drugName,
+                  drugPrice: this.drugoutdetailList[i].drugPrice,
+                  drugOrder: this.drugoutdetailList[i].drugOrder,
+                  drugValiddate: this.drugoutdetailList[i].drugValiddate,
+                }
+                await listDrugstock(paramssearch).then(res => {
+                    let changeParams = {
+                      id: res.rows[0].id,
+                      drugCount: res.rows[0].drugCount - this.drugoutdetailList[i].drugCount
+                    }
+                    console.log("count"+i+":"+changeParams.drugCount )
+                    updateDrugstock(changeParams);
+                    this.$modal.msgSuccess("出库成功");
+
+                })
+              }
+              this.getList();
+            }
+
+        // changeStatus(id);
+
+
+
+      }else{
+        this.$modal.msgError("该状态无法修改");
       }
-      console.log(flag);
-    }
+
+
     },
 
     /** 查询药品出库列表 */
@@ -573,6 +669,8 @@ export default {
           this.open = true;
           this.title = "添加药品出库";
         }
+        var defaultDate = this.getNowTime();
+        this.$set(this.form, "outDate", defaultDate);
       })
     },
     /** 修改按钮操作 */
@@ -591,9 +689,8 @@ export default {
       }else{
         this.$modal.msgError("该状态无法修改");
       }
-
     },
-    handleOut(){
+    async handleOut(){
       this.reset();
       this.flag=0;
       const id = this.ids[0]
@@ -601,57 +698,65 @@ export default {
       const outStatus = this.outStatus[0]
       console.log(outStatus)
       if(outStatus==="未出库"){
-        getDrugout(id).then(response => {
+        await getDrugout(id).then(response => {
           this.form = response.data;
           this.drugoutdetailList = response.data.drugoutdetailList;
-          // console.log(this.form)
-          console.log(this.drugoutdetailList.length);
-          if (this.drugoutdetailList.length>0) {
-            for (let i = 0; i < this.drugoutdetailList.length; i++) {
-              // console.log(this.drugoutdetailList[i].drugId)
-              console.log(this.drugoutdetailList[i])
-              let paramssearch = {
-                drugId: this.drugoutdetailList[i].drugId,
-                drugName: this.drugoutdetailList[i].drugName,
-                drugPrice: this.drugoutdetailList[i].drugPrice,
-                drugOrder: this.drugoutdetailList[i].drugOrder,
-                drugValiddate: this.drugoutdetailList[i].drugValiddate,
-              }
-              listDrugstock(paramssearch).then(res => {
-                console.log(res.rows.length)
-                console.log(this.drugoutdetailList[i].drugCount)
-                if(res.rows.length > 0){
-                  let changeParams = {
-                    id: res.rows[0].id,
-                    drugCount: res.rows[0].drugCount - this.drugoutdetailList[i].drugCount
-                  }
-                  updateDrugstock(changeParams);
-                  this.$modal.msgSuccess("出库成功");
-                  this.getList();
-                }else{
-                  this.$modal.msgWarning("出库失败");
-                  this.getList();
-
-                }
-
-              })
-            }
-          console.log(this.flag)
-
-          }else{
-            this.$modal.msgError("非法数据");
-          }
-
         });
-        // changeStatus(id);
+        //flag 判断药品量是否足够
+        let flag = 0;
+        for (let i = 0; i < this.drugoutdetailList.length; i++) {
+          // console.log(this.drugoutdetailList[i].drugId)
+          // console.log(this.drugoutdetailList[i])
+          let paramssearch = {
+            drugId: this.drugoutdetailList[i].drugId,
+            drugName: this.drugoutdetailList[i].drugName,
+            drugPrice: this.drugoutdetailList[i].drugPrice,
+            drugOrder: this.drugoutdetailList[i].drugOrder,
+            drugValiddate: this.drugoutdetailList[i].drugValiddate,
+          }
+          await listDrugstock(paramssearch).then(res => {
+            if(res.rows.length > 0){
+              let changeParams = {
+                id: res.rows[0].id,
+                drugCount: res.rows[0].drugCount - this.drugoutdetailList[i].drugCount
+              }
+              if(changeParams.drugCount<0){
+                flag=flag+1
+              }
+            }else{
+              this.$modal.msgWarning("存在库存中未登记商品");
+            }
+          })
+        }
+        //对上面进行flag判断
+        if(flag !=0){
+          this.$modal.msgWarning("存在库存不足物品");
+        }else {
+          // 如果足够出库
+          await changeStatus(id);
+          for (let i = 0; i < this.drugoutdetailList.length; i++) {
+            let paramssearch = {
+              drugId: this.drugoutdetailList[i].drugId,
+              drugName: this.drugoutdetailList[i].drugName,
+              drugPrice: this.drugoutdetailList[i].drugPrice,
+              drugOrder: this.drugoutdetailList[i].drugOrder,
+              drugValiddate: this.drugoutdetailList[i].drugValiddate,
+            }
+            await listDrugstock(paramssearch).then(res => {
+              let changeParams = {
+                id: res.rows[0].id,
+                drugCount: res.rows[0].drugCount - this.drugoutdetailList[i].drugCount
+              }
+              updateDrugstock(changeParams);
+              this.$modal.msgSuccess("出库成功");
 
-
-
+            })
+          }
+          this.getList();
+        }
       }else{
         this.$modal.msgError("该状态无法修改");
       }
-
-
     },
     /** 提交按钮 */
     submitForm() {
@@ -683,45 +788,44 @@ export default {
           if (this.form.id != null) {
             this.form.outStatus = "已出库"
             console.log(this.form)
-            updateDrugout(this.form).then(response => {
-              this.$modal.msgSuccess("修改成功");
-              // this.open = false;
-              // this.getList();
-            });
-            // if (this.drugoutdetailList.length>0){
-            //   for (let i=0;i<this.drugoutdetailList.length;i++) {
-            //     // console.log(this.drugoutdetailList[i].drugId)
-            //     console.log(this.drugoutdetailList[i])
-            //     let paramssearch={
-            //       drugId:this.drugoutdetailList[i].drugId,
-            //       drugName:this.drugoutdetailList[i].drugName,
-            //       drugPrice:this.drugoutdetailList[i].drugPrice,
-            //       drugOrder:this.drugoutdetailList[i].drugOrder,
-            //       drugValiddate:this.drugoutdetailList[i].drugValiddate,
-            //     }
-            //     listDrugstock(paramssearch).then(res =>{
-            //
-            //       if(res.rows.length<=0){
-            //         return
-            //       }else{
-            //         console.log(res.rows[0].drugCount)
-            //         console.log(this.drugoutdetailList[i].drugCount)
-            //         let changeParams = {
-            //           id:res.rows[0].id,
-            //           drugCount:res.rows[0].drugCount - this.drugoutdetailList[i].drugCount
-            //         }
-            //         updateDrugstock(changeParams);
-            //         this.$modal.msgSuccess("出库成功");
-            //         this.open = false;
-            //         this.getList();
-            //       }
-            //
-            //     })
-            //   }
-            // }else{
-            //   this.$modal.msgSuccess("无效数据");
-            // }
+            if (this.drugoutdetailList.length>0){
+              updateDrugout(this.form).then(response => {
+                this.$modal.msgSuccess("修改成功");
+                // this.open = false;
+                // this.getList();
+              });
+              for (let i=0;i<this.drugoutdetailList.length;i++) {
+                // console.log(this.drugoutdetailList[i].drugId)
+                console.log(this.drugoutdetailList[i])
+                let paramssearch={
+                  drugId:this.drugoutdetailList[i].drugId,
+                  drugName:this.drugoutdetailList[i].drugName,
+                  drugPrice:this.drugoutdetailList[i].drugPrice,
+                  drugOrder:this.drugoutdetailList[i].drugOrder,
+                  drugValiddate:this.drugoutdetailList[i].drugValiddate,
+                }
+                listDrugstock(paramssearch).then(res =>{
 
+                  if(res.rows.length<=0){
+                    return
+                  }else{
+                    console.log(res.rows[0].drugCount)
+                    console.log(this.drugoutdetailList[i].drugCount)
+                    let changeParams = {
+                      id:res.rows[0].id,
+                      drugCount:res.rows[0].drugCount - this.drugoutdetailList[i].drugCount
+                    }
+                    updateDrugstock(changeParams);
+                    this.$modal.msgSuccess("出库成功");
+                    this.open = false;
+                    this.getList();
+                  }
+
+                })
+              }
+            }else{
+              this.$modal.msgSuccess("无效数据");
+            }
           } else {
             this.form.outStatus = "已出库"
 

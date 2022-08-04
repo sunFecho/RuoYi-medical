@@ -46,6 +46,7 @@
             <if test="outOrderid != null "> and a.out_orderid = #{outOrderid}</if>
             <if test="params.beginOutDate != null and params.beginOutDate != '' and params.endOutDate != null and params.endOutDate != ''"> and out_date between #{params.beginOutDate} and #{params.endOutDate}</if>
         </where>
+        order by a.out_date desc
     </select>
 
 </mapper>

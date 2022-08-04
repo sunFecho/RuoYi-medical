@@ -88,7 +88,22 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
          </trim>
     </insert>
 
-
+    <update id="updateDrugout" parameterType="Drugout">
+        update drugout
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="outStatus != null">out_status = #{outStatus},</if>
+            <if test="outType != null">out_type = #{outType},</if>
+            <if test="outOrderid != null">out_orderid = #{outOrderid},</if>
+            <if test="outDate != null">out_date = #{outDate},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="isvalid != null">isvalid = #{isvalid},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
 
     <delete id="deleteDrugoutById" parameterType="Long">
         delete from drugout where id = #{id}

@@ -132,7 +132,7 @@
         <el-row>
           <el-col :span="12">
         <el-form-item label="药品编号" prop="drugId">
-          <el-input v-model="form.drugId" placeholder="请输入药品编号"  />
+          <el-input v-model="form.drugId" placeholder="请输入药品编号" oninput="value=value.replace(/[^\d]/g,'')" />
         </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -537,6 +537,7 @@ export default {
           { required: true, message: "包装规格不能为空", trigger: "blur" }
         ],
         drugId:[
+          { required: true, message: "不能为空", trigger: "blur" },
           {validator: validate , trigger: 'blur'}
         ]
       },

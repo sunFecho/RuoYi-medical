@@ -55,7 +55,7 @@ public class Drugstock extends BaseEntity
 
     /** 批次号 */
     @Excel(name = "批次号")
-    private Long drugOrder;
+    private String drugOrder;
 
     /** 有效期 */
     @JsonFormat(pattern = "yyyy-MM-dd")
@@ -68,6 +68,14 @@ public class Drugstock extends BaseEntity
 
     public Long getDrugCount() {
         return drugCount;
+    }
+
+    public String getDrugOrder() {
+        return drugOrder;
+    }
+
+    public void setDrugOrder(String drugOrder) {
+        this.drugOrder = drugOrder;
     }
 
     public void setDrugCount(Long drugCount) {
@@ -146,15 +154,6 @@ public class Drugstock extends BaseEntity
     public String getDrugPackingunit() 
     {
         return drugPackingunit;
-    }
-    public void setDrugOrder(Long drugOrder) 
-    {
-        this.drugOrder = drugOrder;
-    }
-
-    public Long getDrugOrder() 
-    {
-        return drugOrder;
     }
     public void setDrugValiddate(Date drugValiddate) 
     {

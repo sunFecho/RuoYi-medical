@@ -46,6 +46,7 @@
             <if test="inOrderid != null "> and a.in_orderid = #{inOrderid}</if>
             <if test="params.beginInDate != null and params.beginInDate != '' and params.endInDate != null and params.endInDate != ''"> and a.in_date between #{params.beginInDate} and #{params.endInDate}</if>
         </where>
+        order by a.in_date desc
     </select>
 
 </mapper>
