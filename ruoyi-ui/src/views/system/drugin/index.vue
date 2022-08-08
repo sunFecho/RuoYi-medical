@@ -1,5 +1,8 @@
 <template>
   <div class="app-container">
+
+
+
     <el-form :model="queryParams" ref="queryForm" size="small" :inline="true" v-show="showSearch" label-width="68px">
 
       <el-form-item label="入库类型" prop="inType">
@@ -263,7 +266,7 @@
 <!--              <el-form ref="form" :model="form">-->
 <!--              label-width="0"  style="margin-bottom: 0;"-->
               <el-form-item :prop="'drugindetailList.'+ scope.$index +'.drugCount'" :rules="rules1.drugCount" label-width="0"  style="margin-bottom: 0;">
-              <el-input-number :controls="false" v-model="scope.row.drugCount" placeholder="请输入数量" :style="{width:'100px'}"/>
+              <el-input-number :controls="false" v-model="scope.row.drugCount" placeholder="请输入数量" :style="{width:'100px'}" :min="0"/>
               </el-form-item>
 <!--              </el-form>-->
 
@@ -281,7 +284,7 @@
             <template slot-scope="scope">
 <!--              <el-form ref="form">-->
 <!--                <el-form-item prop="drugPrice" :rules="[{required: true, message: '不能为空', trigger: 'blur' }]">-->
-              <el-input-number :controls="false" :precision="2" v-model="scope.row.drugPrice" placeholder="请输入单价" :style="{width:'70px'}"/>
+              <el-input-number :controls="false" :precision="2" v-model="scope.row.drugPrice" placeholder="请输入单价" :style="{width:'70px'}" :min="0.00"/>
 <!--                </el-form-item>-->
 <!--              </el-form>-->
             </template>
@@ -370,6 +373,7 @@ import {addDrugstock, listDrugstock, updateDrugstock} from "@/api/system/drugsto
 export default {
   name: "Drugin",
   dicts: ['drug_type', 'drug_toxicology','drug_formulation','drug_packingunit','drug_numunit','drug_use','drug_doseunit','in_type','in_status'],
+
   data() {
     return {
       // 备注时间范围
@@ -426,16 +430,15 @@ export default {
         }],
       },
       rules1:{
-        drugCount: [{
-          required: true,
-          message: '数量不能为空',
-          trigger: 'blur'
-        }],
-        drugOrder: [{
-          required: true,
-          message: '不能为空',
-          trigger: 'blur'
-        }],
+        drugCount: [{required: true, message: '数量不能为空', trigger: 'blur'}
+        ],
+        drugOrder: [{required: true, message: '不能为空', trigger: 'blur'},
+          { pattern: /^[^\u4e00-\u9fa5]+$/, message: '不允许输入中文',trigger: 'blur'},
+          { pattern: /^[A-Za-z0-9\u4e00-\u9fa5]+$/, message: '不允许输入空格等特殊符号',trigger: 'blur'},
+          { pattern: /[0-9a-zA-Z]{1,6}/, message: '只可以输入数字和字母',trigger: 'blur'},
+        ],
+
+
       },
       totallist:[],
       inStatus:[],
@@ -443,6 +446,10 @@ export default {
   },
   created() {
     this.getList();
+    for(let i= 0 ;i<10;i++){
+      console.error('疯狂星期四  v我50')
+      console.error('疯狂星期四  v我50')
+    }
   },
   methods: {
     handlein(){
@@ -482,7 +489,6 @@ export default {
                       //没有相似数据 存入数据
                       paramssave.drugCount = count
                       addDrugstock(paramssave).then(res1 =>{
-
                       })
                     }else{
                       //有相似数据 修改数据

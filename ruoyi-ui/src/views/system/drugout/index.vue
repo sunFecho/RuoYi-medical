@@ -255,7 +255,7 @@
           <el-table-column label="数量" prop="drugCount" width="150">
             <template slot-scope="scope">
 <!--              {{scope.row.maxCount}}-->
-              <el-input-number :controls="false" v-model="scope.row.drugCount" :style="{width:'100px'}" :max="scope.row.maxCount"/>
+              <el-input-number :controls="false" v-model="scope.row.drugCount" :style="{width:'100px'}" :max="scope.row.maxCount" :min="0"/>
             </template>
           </el-table-column>
           <el-table-column label="单价" prop="drugPrice" width="150">
@@ -295,7 +295,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submitForm">保 存</el-button>
-        <el-button type="primary" @click="submitForm1">保存并出库</el-button>
+        <el-button type="primary" @click="submitForm2">保存并出库</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -406,6 +406,7 @@ export default {
       sockCount:null,
       // 表单参数
       form: {},
+
       // 表单校验
       rules: {
         outOrderid:[{
@@ -789,7 +790,7 @@ export default {
             this.form.outStatus = "已出库"
             console.log(this.form)
             if (this.drugoutdetailList.length>0){
-              updateDrugout(this.form).then(response => {
+               updateDrugout(this.form).then(response => {
                 this.$modal.msgSuccess("修改成功");
                 // this.open = false;
                 // this.getList();
@@ -805,9 +806,7 @@ export default {
                   drugValiddate:this.drugoutdetailList[i].drugValiddate,
                 }
                 listDrugstock(paramssearch).then(res =>{
-
                   if(res.rows.length<=0){
-                    return
                   }else{
                     console.log(res.rows[0].drugCount)
                     console.log(this.drugoutdetailList[i].drugCount)
@@ -828,7 +827,6 @@ export default {
             }
           } else {
             this.form.outStatus = "已出库"
-
             if (this.drugoutdetailList.length>0){
               addDrugout(this.form).then(response => {
               });
@@ -842,6 +840,7 @@ export default {
                     drugOrder:this.drugoutdetailList[i].drugOrder,
                     drugValiddate:this.drugoutdetailList[i].drugValiddate,
                   }
+
                 listDrugstock(paramssearch).then(res =>{
                   console.log(res.rows[0].drugCount)
                   console.log(this.drugoutdetailList[i].drugCount)
@@ -864,6 +863,136 @@ export default {
         }
       });
     },
+
+
+    async submitForm2(){
+      this.$refs["form"].validate(async valid => {
+        if (valid) {
+          this.form.drugoutdetailList = this.drugoutdetailList;
+          //判断为修改
+          if (this.form.id != null) {
+            this.form.outStatus = "已出库"
+            console.log(this.form)
+            if (this.drugoutdetailList.length > 0) {
+              updateDrugout(this.form).then(response => {
+                this.$modal.msgSuccess("修改成功");
+                // this.open = false;
+                // this.getList();
+              });
+              for (let i = 0; i < this.drugoutdetailList.length; i++) {
+                // console.log(this.drugoutdetailList[i].drugId)
+                console.log(this.drugoutdetailList[i])
+                let paramssearch = {
+                  drugId: this.drugoutdetailList[i].drugId,
+                  drugName: this.drugoutdetailList[i].drugName,
+                  drugPrice: this.drugoutdetailList[i].drugPrice,
+                  drugOrder: this.drugoutdetailList[i].drugOrder,
+                  drugValiddate: this.drugoutdetailList[i].drugValiddate,
+                }
+                await listDrugstock(paramssearch).then(res => {
+                  if (res.rows.length <= 0) {
+                    this.$alert('药品：'+paramssearch.drugName+' 库存不存在', '数据错误', {
+                      confirmButtonText: '确定',
+                    });
+                  } else {
+                      console.log(res.rows[0].drugCount)
+                    console.log(this.drugoutdetailList[i].drugCount)
+                    let changeParams = {
+                      id: res.rows[0].id,
+                      drugCount: res.rows[0].drugCount - this.drugoutdetailList[i].drugCount
+                    }
+                    updateDrugstock(changeParams);
+                    this.$modal.msgSuccess("出库成功");
+                    this.open = false;
+                    this.getList();
+                  }
+                })
+              }
+            } else {
+              this.$modal.msgSuccess("无效数据");
+            }
+          }
+          //判断为增加
+          else {
+            this.form.outStatus = "已出库"
+            if (this.drugoutdetailList.length > 0) {
+              // addDrugout(this.form).then(response => {
+              // });
+              let flag = 0;
+              let mark = [];
+              for (let i = 0; i < this.drugoutdetailList.length; i++) {
+                // console.log(this.drugoutdetailList[i].drugId)
+                // console.log(this.drugoutdetailList[i])
+                let paramssearch = {
+                  drugId: this.drugoutdetailList[i].drugId,
+                  drugName: this.drugoutdetailList[i].drugName,
+                  drugPrice: this.drugoutdetailList[i].drugPrice,
+                  drugOrder: this.drugoutdetailList[i].drugOrder,
+                  drugValiddate: this.drugoutdetailList[i].drugValiddate,
+                }
+                await listDrugstock(paramssearch).then(res => {
+                  // console.log(paramssearch)
+                  let changeParams = {
+                    id: res.rows[0].id,
+                    drugCount: res.rows[0].drugCount - this.drugoutdetailList[i].drugCount
+                  }
+                  if (changeParams.drugCount < 0) {
+                    flag = flag + 1;
+                    mark.push(paramssearch.drugName)
+                  }
+                  // updateDrugstock(changeParams);
+                  // this.$modal.msgSuccess("出库成功");
+                  // this.open = false;
+                  // this.getList();
+                })
+              }
+              // console.log("flag" + flag)
+              // console.log(mark)
+             if(flag == 0){
+               addDrugout(this.form).then(response => {
+               });
+               for (let i = 0; i < this.drugoutdetailList.length; i++) {
+                 // console.log(this.drugoutdetailList[i].drugId)
+                 // console.log(this.drugoutdetailList[i])
+                 let paramssearch = {
+                   drugId: this.drugoutdetailList[i].drugId,
+                   drugName: this.drugoutdetailList[i].drugName,
+                   drugPrice: this.drugoutdetailList[i].drugPrice,
+                   drugOrder: this.drugoutdetailList[i].drugOrder,
+                   drugValiddate: this.drugoutdetailList[i].drugValiddate,
+                 }
+                 listDrugstock(paramssearch).then(res => {
+                   // console.log(paramssearch)
+
+                   let changeParams = {
+                     id: res.rows[0].id,
+                     drugCount: res.rows[0].drugCount - this.drugoutdetailList[i].drugCount
+                   }
+                   updateDrugstock(changeParams);
+                   this.$modal.msgSuccess("出库成功");
+                   this.open = false;
+                   this.getList();
+                 })
+               }
+             }
+              else{
+                console.log(mark)
+               this.$alert('药品：'+mark+" 库存数量不足，请修改数量", '库存警告', {
+                 confirmButtonText: '确定',
+               });
+             }
+            } else {
+              this.$modal.msgSuccess("无效数据");
+            }
+
+          }
+        }
+      });
+    },
+
+
+
+
     /** 删除按钮操作 */
     handleDelete(row) {
       const ids = row.id || this.ids;

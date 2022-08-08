@@ -112,4 +112,17 @@ public class DrugstockController extends BaseController
         List<Drugstock> list = drugstockService.selectDrugstockListLimit(drugstock);
         return getDataTable(list);
     }
+
+//    /**
+//     * 检查药品库存
+//     */
+//    @PreAuthorize("@ss.hasPermi('system:drugstock:list')")
+//    @GetMapping("/check")
+//    public AjaxResult check(Drugstock drugstock,Long id)
+//    {
+//        System.out.println(drugstockService.selectDrugstockById(id).getDrugCount());
+//        return AjaxResult.success("success");
+//    }
+
+
 }

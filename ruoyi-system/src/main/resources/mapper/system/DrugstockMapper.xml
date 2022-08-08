@@ -31,7 +31,6 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="drugEngname != null  and drugEngname != ''"> and drug_engname like concat('%', #{drugEngname}, '%')</if>
             <if test="drugType != null  and drugType != ''"> and drug_type = #{drugType}</if>
             <if test="drugPackage != null  and drugPackage != ''"> and drug_package = #{drugPackage}</if>
-            <if test="drugCount != null  and drugCount != ''"> and drug_count = #{drugCount}</if>
             <if test="drugPrice != null "> and drug_price = #{drugPrice}</if>
             <if test="drugPackingunit != null  and drugPackingunit != ''"> and drug_packingunit = #{drugPackingunit}</if>
             <if test="drugOrder != null "> and drug_order = #{drugOrder}</if>
