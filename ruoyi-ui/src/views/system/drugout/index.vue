@@ -902,22 +902,26 @@ export default {
                       drugCount: res.rows[0].drugCount - this.drugoutdetailList[i].drugCount
                     }
                     updateDrugstock(changeParams);
-                    this.$modal.msgSuccess("出库成功");
-                    this.open = false;
-                    this.getList();
+                    // this.$modal.msgSuccess("出库成功");
+                    // this.open = false;
+                    // this.getList();
                   }
                 })
               }
             } else {
               this.$modal.msgSuccess("无效数据");
             }
+            updateDrugout(this.form).then(response => {
+              this.$modal.msgSuccess("修改成功");
+              this.open = false;
+              this.getList();
+            });
           }
           //判断为增加
           else {
             this.form.outStatus = "已出库"
             if (this.drugoutdetailList.length > 0) {
-              // addDrugout(this.form).then(response => {
-              // });
+
               let flag = 0;
               let mark = [];
               for (let i = 0; i < this.drugoutdetailList.length; i++) {
@@ -949,8 +953,7 @@ export default {
               // console.log("flag" + flag)
               // console.log(mark)
              if(flag == 0){
-               addDrugout(this.form).then(response => {
-               });
+
                for (let i = 0; i < this.drugoutdetailList.length; i++) {
                  // console.log(this.drugoutdetailList[i].drugId)
                  // console.log(this.drugoutdetailList[i])
@@ -969,11 +972,14 @@ export default {
                      drugCount: res.rows[0].drugCount - this.drugoutdetailList[i].drugCount
                    }
                    updateDrugstock(changeParams);
-                   this.$modal.msgSuccess("出库成功");
-                   this.open = false;
-                   this.getList();
+
                  })
                }
+               addDrugout(this.form).then(response => {
+                 this.$modal.msgSuccess("出库成功");
+                 this.open = false;
+                 this.getList();
+               });
              }
               else{
                 console.log(mark)

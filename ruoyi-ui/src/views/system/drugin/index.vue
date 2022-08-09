@@ -302,7 +302,7 @@
           <el-table-column label="有效期*" prop="drugValiddate" width="240">
             <template slot-scope="scope">
 <!--              <el-form>-->
-              <el-form-item :prop="'drugindetailList.'+ scope.$index +'.drugValiddate'" :rules="rules1.drugOrder" label-width="0"  style="margin-bottom: 0;">
+              <el-form-item :prop="'drugindetailList.'+ scope.$index +'.drugValiddate'" :rules="rules1.drugValiddate" label-width="0"  style="margin-bottom: 0;">
               <el-date-picker clearable v-model="scope.row.drugValiddate" type="date" value-format="yyyy-MM-dd" placeholder="请选择有效期" />
                 </el-form-item>
 <!--              </el-form>-->
@@ -437,7 +437,8 @@ export default {
           { pattern: /^[A-Za-z0-9\u4e00-\u9fa5]+$/, message: '不允许输入空格等特殊符号',trigger: 'blur'},
           { pattern: /[0-9a-zA-Z]{1,6}/, message: '只可以输入数字和字母',trigger: 'blur'},
         ],
-
+        drugValiddate: [{required: true, message: '不能为空', trigger: 'blur'},
+        ],
 
       },
       totallist:[],
@@ -446,10 +447,10 @@ export default {
   },
   created() {
     this.getList();
-    for(let i= 0 ;i<10;i++){
-      console.error('疯狂星期四  v我50')
-      console.error('疯狂星期四  v我50')
-    }
+    // for(let i= 0 ;i<10;i++){
+    //   console.error('疯狂星期四  v我50')
+    //   console.error('疯狂星期四  v我50')
+    // }
   },
   methods: {
     handlein(){
@@ -719,14 +720,13 @@ export default {
         }
       });
     },
-    submitForm1() {
+   async submitForm1() {
       this.$refs["form"].validate(valid => {
         if (valid) {
           // this.form.drugindetailList = this.drugindetailList;
           if (this.form.id != null) {
             this.form.inStatus="已入库";
-            updateDrugin(this.form).then(response => {
-            });
+
             if (this.drugindetailList.length>0){
               for (let i=0;i<this.drugindetailList.length;i++){
                 console.log(this.drugindetailList[i].drugId)
@@ -771,17 +771,19 @@ export default {
 
                 })
               }
-              this.$modal.msgSuccess("修改成功");
-              this.open = false;
-              this.getList();
+              updateDrugin(this.form).then(response => {
+                this.$modal.msgSuccess("修改成功");
+                this.open = false;
+                this.getList();
+              });
+
             }else {
               this.$modal.msgSuccess("无效数据");
             }
           } else {
             // console.log(this.form.drugindetailList)
             this.form.inStatus="已入库";
-            addDrugin(this.form).then(response => {
-            });
+
             if (this.drugindetailList.length>0){
             for (let i=0;i<this.drugindetailList.length;i++){
               console.log(this.drugindetailList[i].drugId)
@@ -826,9 +828,13 @@ export default {
 
               })
             }
-              this.$modal.msgSuccess("新增成功");
-              this.open = false;
-              this.getList();
+              addDrugin(this.form).then(response => {
+                this.$modal.msgSuccess("新增成功");
+                this.getList();
+                this.open = false;
+              });
+
+
             }else {
                 this.$modal.msgSuccess("无效数据");
             }

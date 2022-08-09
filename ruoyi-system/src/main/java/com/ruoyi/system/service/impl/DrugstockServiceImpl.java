@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.system.mapper.DrugstockMapper;
 import com.ruoyi.system.domain.Drugstock;
 import com.ruoyi.system.service.IDrugstockService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 药品库存Service业务层处理
@@ -50,9 +51,14 @@ public class DrugstockServiceImpl implements IDrugstockService
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor=Exception.class)
     public int insertDrugstock(Drugstock drugstock)
     {
-        return drugstockMapper.insertDrugstock(drugstock);
+        try {
+          return drugstockMapper.insertDrugstock(drugstock);
+        } catch (Exception e){
+            throw e;
+        }
     }
 
     /**

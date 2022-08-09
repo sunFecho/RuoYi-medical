@@ -27,65 +27,7 @@ export default {
           center: [120.479, 31.899],
           zoom: 12,
         });
-
-//定义提示框
-        var dialog = new TooltipDialog({
-          id: "tooltipDialog",
-          style: "position: absolute; width: 250px; font: normal normal normal 10pt Helvetica;z-index:100"
-        });
-        dialog.startup();
-        var highlightSymbol = new SimpleFillSymbol(//红边画笔
-          SimpleFillSymbol.STYLE_SOLID,
-          new SimpleLineSymbol(
-            SimpleLineSymbol.STYLE_SOLID,
-            new Color([255, 0, 0]), 3
-          ),
-          new Color([125, 125, 125, 0.35])
-        );
-
-//打开提示框
-        function showtip(template) {
-          return function (evt) {
-            var content = esriLang.substitute(evt.graphic.attributes, template);
-            var highlightGraphic = new Graphic(evt.graphic.geometry, highlightSymbol);
-            map.graphics.add(highlightGraphic);//红色描边
-
-            dialog.setContent(content);
-
-            domStyle.set(dialog.domNode, "opacity", 0.85);
-            dijitPopup.open({
-              popup: dialog,
-              x: evt.pageX,
-              y: evt.pageY
-            });
-          }
-        }
-//关闭提示框
-        function closeDialog() {
-          map.graphics.clear();//擦去红色描边
-          dijitPopup.close(dialog);
-        }
-
-        function buildFeatureLayer(param) {
-          var fl = new FeatureLayer(param.url, {
-            id: param.id,
-            mode: FeatureLayer.MODE_ONDEMAND,
-            definitionExpression: param.expression,
-            infoTemplate: param.template,
-            outFields: param.fields,
-            visible: false
-          });
-          map.addLayer(fl);
-          if (param.template != null) {
-            fl.on("mouse-over", showtip(param.template));//mouseover时，打开提示框
-          }
-          return fl;
-        }
-        map.on("load", function () {
-          map.graphics.enableMouseEvents();
-          map.graphics.on("mouse-out", closeDialog);//mouseout时，关闭提示框
-          map.on("mouse-down", closeDialog);
-        });
+        this.view.ui.remove('attribution');
       });
   },
 
